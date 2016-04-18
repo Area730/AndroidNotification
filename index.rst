@@ -1,114 +1,315 @@
-.. Android Plugin documentation master file, created by
-   sphinx-quickstart on Tue Apr 12 02:04:32 2016.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+#############################
+Installing and updating pyLCI
+#############################
+   
+=======
+Install
+=======
 
-Admob Plugin
-===================================
+1. Import `this plugin`_ into your Unity project.
 
-------
-Import
-------
-
-* Download this plugin_ 
-* Watch this_ tutorial: 
-.. _plugin: https://www.assetstore.unity3d.com/en/#!/content/57268
-.. _this: https://www.youtube.com/watch?v=S7F9enxcvTE
-
-.. raw:: html
-
-    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="https://www.youtube.com/embed/S7F9enxcvTE" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe><br/>
-    </div>
-
-| 
-
-* Or follow these steps: 
-
-
-1. Drag Admob prefab from *Area730/Admob/Prefabs* into your scene. You need to add this prefab to your game only once as **AdmobManager** is a singleton. 
-
-
-.. image:: _static/1.png
-    :align: center
-
-2. Set Admob unit ids and you are almost done 
-
-.. image:: _static/2.png
-    :align: center
-
-3. To show banner  call *AdmobManager.Instance.RequestBanner(AdPosition position)* where position is **enum** and can be::
-
-    AdPosition.Top
-    AdPosition.Bottom
-    AdPosition.TopLeft
-    AdPosition.TopRight
-    AdPosition.BottomLeft
-    AdPosition.BottomRight
-
-You can also specify the size of the banner as second parameter. The default size is **320x50**.
-To show interstitial you have first to load it by calling **AdmobManager.Instance.RequestInterstitial()**. After the interstitial is loaded, the **OnInterstitialLoaded()** callbacks will be invoked. Admob prefab comes with default attached callback functions (see *Area730/Admob/Scripts/AdmobController.cs*). You can also add your own if you want. 
-
-.. image:: _static/3.png
-    :align: center
-
-After the interstitial is loaded, you can show the ad by calling **AdmobManager.Instance.ShowInterstitial()**.  
-
------------------
-Building projects
------------------
-
-After configuring your mediation you need to build your game to mobile devices. Sometimes it might cause some errors this section helps you to solve it
-
------------------
-IOS common errors
------------------
-
-1. When you use old version of Unity(4.6 and lower) the included GoogleMobileAds.framework_ in folder *Assets/Plugins/IOS* will not be automatically linked to your XCode project. To solve this problem copy GoogleMobileAds.framework_ to the root of your exported project. 
-
-.. _GoogleMobileAds.framework: https://developers.google.com/admob/ios/download
-
-.. image:: _static/framework.png
-    :align: center
-
-2. After that you need to config your **build settings**  
-
-| 
+2. Check if you have **AndroidManifest.xml** in Assets/Plugins/Android folder.
+**If you don't** - add this manifest_ to *Assets/Plugins/Android* folder.      
+**If you do** - check if it contains UnityPlayerNativeActivity or the one that extends it.       
+If you have UnityPlayerNativeActivity - you are good to go.      
+If you have activity that extends **UnityPlayerNativeActivity**- set its full name (e.g. com.unity3d.player.UnityPlayerNativeActivity) in *Window->Ultimate Local Notifications -> Settings*   
  
-    2.1 Disable bit code 
+.. image:: _static/images/unityClassField.png
 
-    .. image:: _static/bitcode.png
-        :align: center
+If you don't have any - add this activity to your manifest:
 
-| 
+.. code-block:: xml
 
-    2.2 Enable Modules (C and Objective-C) 
-    
-    .. image:: _static/modules.png
-        :align: center
+    <activity android:name="com.unity3d.player.UnityPlayerNativeActivity" android:label="@string/app_name">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+            <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+        </intent-filter>
+        <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
+        <meta-data android:name="unityplayer.ForwardNativeEventsToDalvik" android:value="false" />
+    </activity>
+
+==================
+Local Notification 
+==================
+
+-----------------------------
+Schedule simple notifications
+-----------------------------
+
+**The package contains code samples in Assets/Area730/Notifications/Examples/Scripts folder.**
+
+The notifications are created using **NotificationBuilder** class. Its constructor takes 3 arguments - id of the notification, title and notification text.
+Next example example shows how to schedule the notification that will be shown immediately:
+.. code-block:: c#
+
+    int id          = 1;
+    string title    = "Notification titile";
+    string body     = "Notification body";
+
+    NotificationBuilder builder = new NotificationBuilder(id, title, body);
+    AndroidNotifications.scheduleNotification(builder.build());
+
+Schedule delayed notifications
+------------------------------
+
+If you want to set delay - call builder.setDelay(int miliseconds) or builder.setDelay(System.TimeSpan delayTime). The next example shows how to create a notification that will be shown in one hour:
+
+.. code-block:: c#
+
+    int id          = 1;
+    string title    = "Notification titile";
+    string body     = "Notification body";
+
+    // Show notification in one hour
+    TimeSpan delay  = new TimeSpan(1, 0, 0); 
+
+    NotificationBuilder builder = new NotificationBuilder(id, title, body);
+    builder.setDelay(delay);
+
+    AndroidNotifications.scheduleNotification(builder.build());
+
+Customization
+-------------
+
+NotificationBuilder allows you to set different parameters of your notification such as color, small icon, large icon, auto cancel, alert once, ticker, notification number, sound, vibration pattern, group, sort key and if the notification repeats every interval of time.    
+
+**All methods with description you can find in NotificationBuilder.cs file.**   
+
+Next example shows scheduling of the notification that will be shown in 15 minutes with ticker, default audio and vibration, with autocancel (if you click it - it will be removed from the list), and with red background color (background color is not supported on some Android versions, please refer to Android docs for more info)
 
 
-3. If you use xCode 7.2  or higher you could get the following error because of incompatibility new xCode and Unity generated files. 
+.. code-block:: c#
 
-.. image:: _static/Noreturn.png
-    :align: center
+    int id          = 1;
+    string title    = "New notification";
+    string body     = "You have some unfinished business!";
+
+    // Show notification in 15 minutes
+    TimeSpan delay  = new TimeSpan(0, 15, 0); 
+
+    NotificationBuilder builder = new NotificationBuilder(id, title, body);
+    builder
+        .setTicker("New notification from your app!")
+        .setDefaults(NotificationBuilder.DEFAULT_ALL)
+        .setDelay(delay)
+        .setAutoCancel(true)
+        .setColor("#B30000");
+
+    AndroidNotifications.scheduleNotification(builder.build()
+
+Repeating notifications
+-----------------------
+To set repeating notification you should set notification as repeating **and set the time interval**.     
+Next example shows scheduling of the notification that will be shown in 5 minutes and then shown every 10 minutes:   
+
+.. code-block:: c#
+
+    int id              = 1;
+    string title        = "New repeating notification";
+    string body         = "You have some unfinished business!";
+
+     // Show notification in 5 minutes
+    TimeSpan delay      = new TimeSpan(0, 5, 0);
+
+    // Show notification with 10 minute interval
+    TimeSpan interval   = new TimeSpan(0, 10, 0);
+
+    NotificationBuilder builder = new NotificationBuilder(id, title, body);
+    builder
+        .setDelay(delay)
+        .setRepeating(true)
+        .setInterval(interval);
+
+    AndroidNotifications.scheduleNotification(builder.build());
 
 
-to solve this problem just delete circled ```NORETURN``` statment. 
-
+Settings custom icons
 ---------------------
-Android common errors
---------------------- 
+You can set custom icons for your notification. There are 2 types of icon - small and large. Small icon is mask.  Both icons should be located in *Assets/Plugins/Android/Notfications/res/drawable* folder or one of the drawable folders (e.g. drawable-mdpi etc.). 
 
-When you trying to build your **apk** unity might throw build error. It might be caused of old Android API Level. The latest version of Admob library requires **API Level 23** . To download this packages go to you **Android SDK** (the path for it find here). 
+You can use these icon generators:    
 
-.. image:: _static/androidSDKPath.png
-    :align: center
+1. `Small icon generator`_ - generate and download archive with your icons. Then just copy all drawable folders from the archive into _Assets/Plugins/Android/Notifications/res_ folder and set **the name of the icon without extension** as your small icon - **builder.setSmallIcon("myIcon")**      
 
-Then install packages from SDK manager.
+2. [Large icon generator](http://romannurik.github.io/AndroidAssetStudio/icons-launcher.html#foreground.space.trim=1&foreground.space.pad=0&foreColor=607d8b%2C0&crop=0&backgroundShape=square&backColor=ffffff%2C100&effects=none) - generate and download archive with your icons. The archive will contain mipmap folders (mipmap-mdpi, mipmap-hdpi etc.). Copy the icons into corresponding **drawable** folders in _Assets/Plugins/Android/Notifications/res_ folder (icon from mipmap-hdpi into drawable-hdpi, mipmap-mdpi into drawable-mdpi etc.). Next, set **the name of the icon without extension** as your large icon - **builder.setLargeIcon("myLargeIcon")**   
+
+.. code-block:: c#
+
+    int     id      = 1;
+    string  title   = "Custom icon";
+    string  body    = "You have some unfinished business!";
+
+    // Show notification in 5 minutes
+    TimeSpan delay = new TimeSpan(0, 5, 0);
+
+    // WARNING: icons should be in Assets/Plugins/Android/Notification/res/drawable(-mdpi etc.) folders
+    NotificationBuilder builder = new NotificationBuilder(id, title, body);
+    builder
+        .setDelay(delay)
+        .setSmallIcon("mySmallIconFilename") 
+        .setLargeIcon("myLargeIconFilename");
+
+    AndroidNotifications.scheduleNotification(builder.build());
 
 
-.. image:: _static/SDK.png
-    :align: center
+Settings custom sound
+---------------------
+You can set custom sound for your notification. The sound should be located in *Assets/Plugins/Android/Notifications/res/raw*  folder. To set custom sound use builder.setSound("mySound") method. **Name of the sound file should be without extension.**
 
-If you have another errors please contact us support@area730.com 
+.. code-block:: c#
+
+    int     id      = 1;
+    string  title   = "Custom sound";
+    string  body    = "You have some unfinished business!";
+
+    // Show notification in 5 minutes
+    TimeSpan delay = new TimeSpan(0, 5, 0);
+
+    // WARNING: the sound should be in Assets/Plugins/Android/Notification/res/raw folder
+    NotificationBuilder builder = new NotificationBuilder(id, title, body);
+    builder
+        .setDelay(delay)
+        .setSound("mySoundFileName");
+
+    AndroidNotifications.scheduleNotification(builder.build());
+
+
+Cancel notification by id (both repeating and one-time)
+-------------------------------------------------------
+To cancel the notification by id, simply call AndroidNotifications.cancelNotification(int id).
+
+.. code-block:: c#
+
+    //cancel notification with id 7
+    AndroidNotifications.cancelNotification(7);
+
+
+Cancel all notifications
+------------------------
+.. code-block:: c#
+
+    AndroidNotifications.cancelAll();
+
+
+Clear shown notifications
+-------------------------
+
+To clear certain notification use AndroidNotifications.clear(int id).    
+
+.. code-block:: c#
+
+    // clear shown notification with id 7
+    AndroidNotifications.clear(7);
+
+
+To clear all shown notifications use AndroidNotifications.clearAll().    
+
+.. code-block:: c#
+
+    // clear all shown notifications
+    AndroidNotifications.clearAll();
+
+
+Updating notifications
+----------------------
+To update one-time or repeating notification, schedule a notification with updated data and with ID of the notification you want to update.
+
+
+Show android toast notification
+-------------------------------
+To show a toast notification use AndroidNotifications.showToast(string text).    
+
+
+.. code-block:: c#
+
+    AndroidNotifications.showToast("Download completed");
+
+
+Notification editor
+-------------------
+Plugin comes with editor extension that allows you to create notifications without the line of code. To open the notification editor window go to *Window -> Android Local Notifications*. 
+
+![](https://www.dropbox.com/s/6eaaozky16zga9g/window-general.png?raw=1)
+
+In **Help** section you will find some useful links. In **Settings** section you can set custom Unity class if your activity extends *UnityPlayerNativeActivity* . 
+In **Notification List** section you can add and modify notifications. 
+       
+![](https://www.dropbox.com/s/oqemhfrotuqwsct/notifEditor.png?raw=1)
+      
+When you set custom notification sound or icons in editor window - they will be automatically copied to Notifications/res/drawable and Notifications/res/raw folders. **Though you will still need to add resized versions to drawable-hdpi and other folders using icon generators mentioned above**. 
+
+For detailed information on notification options please refer to [official Android docs](http://developer.android.com/intl/ru/reference/android/support/v4/app/NotificationCompat.Builder.html)
+
+Schedule notification created in editor
+---------------------------------------
+You can get notification you created by its name you set in editor    
+![](https://www.dropbox.com/s/h49gx2lixcgku8e/nameNotif.png?raw=1)
+
+Next example shows scheduling of the notification created in editor with name **notificationOne**
+
+.. code-block:: c#
+
+    string notificationName = "notificationOne";
+
+    // Method returns builder so you can config your notification afterwards if you want
+    NotificationBuilder builder = AndroidNotifications.GetNotificationBuilderByName(notificationName);
+                
+    // If notification with specified name doesn't exist builder will be null
+    if (builder != null)
+    {
+        Notification notif = builder.build();
+        AndroidNotifications.scheduleNotification(notif);
+    }
+
+
+Push Notification With OneSignal_
+=================================
+To configure push notification for android platform follow next steps:
+
+1. Create GMS_ application by following this_ tutorial instruction.
+
+2. Do `step 3`_  to config your `AndroidManifest.xml`
+
+3. Go to `Assets/Area730/Notifications/PushNotification` drag and drop `PushController.prefab` or just add `CrossPlatformPushNotificationController.cs` script to your gameobject.
+
+4. Fill the values in `CrossPlatformPushNotificationController.cs`.
+
+Now you are ready to send notifications.
+After these steps you will be able to send push notification using `One Signal`_ service.
+
+
+
+Modifying a plugin
+==================
+Source code of the plugin is included in the package. You can easily extend it if you want. Java library is built with **AndroidStudio**. There are 2 tasks in _build.gradle_ file you should modify - **deleteOldJar** and **exportJar**.      
+![](https://www.dropbox.com/s/qbqzhfys4fwa0w4/gradleTasks.png?raw=1)     
+
+In **deleteOldJar** task set path to the jar file you will export so every time you run a new build the old version will be deleted. In **exportJar** set the path where you want to export your jar.     
+
+To export jar from AndroidStudio go to _Gradle Projects/Tasks/Other_ and run **exportJar** task.
+
+In Unity plugin is in _Assets/Plugins/Android/Notifications_ folder. It is stored as android library project.
+
+To debug this plugin in AndroidStudio add **Area730Log** log tag to you logcat filter.
+
+Other
+=====
+All classes are located in **Area730.Notifications** namespace    
+    
+Example scene with sample code is included in the package (*Assets/Area730/Notifications/Examples*)     
+
+
+
+
+
+.. _Python: https://www.python.org/
+.. _this plugin: https://www.assetstore.unity3d.com/#!/content/45507
+.. _manifest: https://yadi.sk/d/PIzCJa-jif8Zo
+.. _Small icon generator: http://romannurik.github.io/AndroidAssetStudio/icons-notification.html#source.space.trim=1&source.space.pad=0&name=ic_stat_example
+.. _OneSignal: https://documentation.onesignal.com/docs/installing-the-onesignal-sdk
+.. _GMS: https://console.cloud.google.com/project
+.. _this: https://documentation.onesignal.com/docs/android-generating-a-gcm-push-notification-key
+.. _step 3: https://documentation.onesignal.com/docs/installing-the-onesignal-sdk
+.. _One Signal: https://onesignal.com/
