@@ -1,20 +1,22 @@
-#############################
-Installing and updating pyLCI
-#############################
-   
+ 
 =======
 Install
 =======
 
-1. Import `this plugin`_ into your Unity project.
+#. Import `this plugin`_ into your Unity project.
 
-2. Check if you have **AndroidManifest.xml** in Assets/Plugins/Android folder.
-**If you don't** - add this manifest_ to *Assets/Plugins/Android* folder.      
-**If you do** - check if it contains UnityPlayerNativeActivity or the one that extends it.       
-If you have UnityPlayerNativeActivity - you are good to go.      
-If you have activity that extends **UnityPlayerNativeActivity**- set its full name (e.g. com.unity3d.player.UnityPlayerNativeActivity) in *Window->Ultimate Local Notifications -> Settings*   
+#. Check if you have **AndroidManifest.xml** in Assets/Plugins/Android folder.
+
+    **If you don't** - add this manifest_ to *Assets/Plugins/Android* folder.
+
+    **If you do** - check if it contains UnityPlayerNativeActivity or the one that extends it.  
+
+    If you have UnityPlayerNativeActivity - you are good to go.
+
+    If you have activity that extends **UnityPlayerNativeActivity**- set its full name (e.g. com.unity3d.player.UnityPlayerNativeActivity) in *Window->Ultimate Local Notifications -> Settings*   
  
-.. image:: _static/images/unityClassField.png
+.. image:: _static/images/unityClassField.png 
+            :align: center
 
 If you don't have any - add this activity to your manifest:
 
@@ -42,6 +44,7 @@ Schedule simple notifications
 
 The notifications are created using **NotificationBuilder** class. Its constructor takes 3 arguments - id of the notification, title and notification text.
 Next example example shows how to schedule the notification that will be shown immediately:
+
 .. code-block:: c#
 
     int id          = 1;
@@ -131,9 +134,9 @@ You can set custom icons for your notification. There are 2 types of icon - smal
 
 You can use these icon generators:    
 
-1. `Small icon generator`_ - generate and download archive with your icons. Then just copy all drawable folders from the archive into _Assets/Plugins/Android/Notifications/res_ folder and set **the name of the icon without extension** as your small icon - **builder.setSmallIcon("myIcon")**      
+1. `Small icon generator`_ - generate and download archive with your icons. Then just copy all drawable folders from the archive into *Assets/Plugins/Android/Notifications/res* folder and set **the name of the icon without extension** as your small icon - **builder.setSmallIcon("myIcon")**      
 
-2. [Large icon generator](http://romannurik.github.io/AndroidAssetStudio/icons-launcher.html#foreground.space.trim=1&foreground.space.pad=0&foreColor=607d8b%2C0&crop=0&backgroundShape=square&backColor=ffffff%2C100&effects=none) - generate and download archive with your icons. The archive will contain mipmap folders (mipmap-mdpi, mipmap-hdpi etc.). Copy the icons into corresponding **drawable** folders in _Assets/Plugins/Android/Notifications/res_ folder (icon from mipmap-hdpi into drawable-hdpi, mipmap-mdpi into drawable-mdpi etc.). Next, set **the name of the icon without extension** as your large icon - **builder.setLargeIcon("myLargeIcon")**   
+2. `Large icon generator`_ - generate and download archive with your icons. The archive will contain mipmap folders (mipmap-mdpi, mipmap-hdpi etc.). Copy the icons into corresponding **drawable** folders in *Assets/Plugins/Android/Notifications/res* folder (icon from mipmap-hdpi into drawable-hdpi, mipmap-mdpi into drawable-mdpi etc.). Next, set **the name of the icon without extension** as your large icon - **builder.setLargeIcon("myLargeIcon")**   
 
 .. code-block:: c#
 
@@ -231,21 +234,25 @@ Notification editor
 -------------------
 Plugin comes with editor extension that allows you to create notifications without the line of code. To open the notification editor window go to *Window -> Android Local Notifications*. 
 
-![](https://www.dropbox.com/s/6eaaozky16zga9g/window-general.png?raw=1)
+.. image:: _static/images/window-general.png
+            :align: center
 
 In **Help** section you will find some useful links. In **Settings** section you can set custom Unity class if your activity extends *UnityPlayerNativeActivity* . 
 In **Notification List** section you can add and modify notifications. 
        
-![](https://www.dropbox.com/s/oqemhfrotuqwsct/notifEditor.png?raw=1)
+.. image:: _static/images/notifEditor.png
+            :align: center
       
 When you set custom notification sound or icons in editor window - they will be automatically copied to Notifications/res/drawable and Notifications/res/raw folders. **Though you will still need to add resized versions to drawable-hdpi and other folders using icon generators mentioned above**. 
 
-For detailed information on notification options please refer to [official Android docs](http://developer.android.com/intl/ru/reference/android/support/v4/app/NotificationCompat.Builder.html)
+For detailed information on notification options please refer to `official Android docs`_
 
 Schedule notification created in editor
 ---------------------------------------
-You can get notification you created by its name you set in editor    
-![](https://www.dropbox.com/s/h49gx2lixcgku8e/nameNotif.png?raw=1)
+You can get notification you created by its name you set in editor   
+
+.. image:: _static/images/nameNotif.png
+        :align: center
 
 Next example shows scheduling of the notification created in editor with name **notificationOne**
 
@@ -263,7 +270,6 @@ Next example shows scheduling of the notification created in editor with name **
         AndroidNotifications.scheduleNotification(notif);
     }
 
-
 Push Notification With OneSignal_
 =================================
 To configure push notification for android platform follow next steps:
@@ -279,18 +285,18 @@ To configure push notification for android platform follow next steps:
 Now you are ready to send notifications.
 After these steps you will be able to send push notification using `One Signal`_ service.
 
-
-
 Modifying a plugin
 ==================
-Source code of the plugin is included in the package. You can easily extend it if you want. Java library is built with **AndroidStudio**. There are 2 tasks in _build.gradle_ file you should modify - **deleteOldJar** and **exportJar**.      
-![](https://www.dropbox.com/s/qbqzhfys4fwa0w4/gradleTasks.png?raw=1)     
+Source code of the plugin is included in the package. You can easily extend it if you want. Java library is built with **AndroidStudio**. There are 2 tasks in *build.gradle* file you should modify - **deleteOldJar** and **exportJar**.
+
+.. image:: _static/images/gradleTasks.png
+            :align: center 
 
 In **deleteOldJar** task set path to the jar file you will export so every time you run a new build the old version will be deleted. In **exportJar** set the path where you want to export your jar.     
 
-To export jar from AndroidStudio go to _Gradle Projects/Tasks/Other_ and run **exportJar** task.
+To export jar from AndroidStudio go to *Gradle Projects/Tasks/Other* and run **exportJar** task.
 
-In Unity plugin is in _Assets/Plugins/Android/Notifications_ folder. It is stored as android library project.
+In Unity plugin is in *Assets/Plugins/Android/Notifications* folder. It is stored as android library project.
 
 To debug this plugin in AndroidStudio add **Area730Log** log tag to you logcat filter.
 
@@ -313,3 +319,5 @@ Example scene with sample code is included in the package (*Assets/Area730/Notif
 .. _this: https://documentation.onesignal.com/docs/android-generating-a-gcm-push-notification-key
 .. _step 3: https://documentation.onesignal.com/docs/installing-the-onesignal-sdk
 .. _One Signal: https://onesignal.com/
+.. _Large icon generator: http://romannurik.github.io/AndroidAssetStudio/icons-launcher.html#foreground.space.trim=1&foreground.space.pad=0&foreColor=607d8b%2C0&crop=0&backgroundShape=square&backColor=ffffff%2C100&effects=none
+..  _official Android docs: http://developer.android.com/intl/ru/reference/android/support/v4/app/NotificationCompat.Builder.html
