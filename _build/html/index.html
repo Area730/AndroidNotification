@@ -1,0 +1,278 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>&lt;no title&gt; &mdash; AndroidNotification 1.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="AndroidNotification 1.5 documentation" href="#" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <p>### Install</p>
+<ol class="arabic simple">
+<li>Import [this plugin](<a class="reference external" href="https://www.assetstore.unity3d.com/#!/content/45507">https://www.assetstore.unity3d.com/#!/content/45507</a>) into your Unity project.</li>
+</ol>
+<p>2. Check if you have <strong>AndroidManifest.xml</strong> in Assets/Plugins/Android folder.
+<strong>If you don&#8217;t</strong> - add this manifest (<a class="reference external" href="https://yadi.sk/d/PIzCJa-jif8Zo">https://yadi.sk/d/PIzCJa-jif8Zo</a>) to _Assets/Plugins/<a href="#id51"><span class="problematic" id="id52">Android_</span></a> folder.
+<strong>If you do</strong> - check if it contains UnityPlayerNativeActivity or the one that extends it.
+If you have UnityPlayerNativeActivity - you are good to go.
+If you have activity that extends <strong>UnityPlayerNativeActivity</strong>- set its full name (e.g. com.unity3d.player.UnityPlayerNativeActivity) in _Window-&gt;Ultimate Local Notifications -&gt; <a href="#id53"><span class="problematic" id="id54">Settings_</span></a></p>
+<p>![](<a class="reference external" href="https://www.dropbox.com/s/k7ffsmb5wlezgni/unityClassField.png?raw=1">https://www.dropbox.com/s/k7ffsmb5wlezgni/unityClassField.png?raw=1</a>)</p>
+<p>If you don&#8217;t have any - add this activity to your manifest:</p>
+<p><code class="docutils literal"><span class="pre">`xml</span>
+<span class="pre">&lt;activity</span> <span class="pre">android:name=&quot;com.unity3d.player.UnityPlayerNativeActivity&quot;</span> <span class="pre">android:label=&quot;&#64;string/app_name&quot;&gt;</span>
+<span class="pre">&lt;intent-filter&gt;</span>
+<span class="pre">&lt;action</span> <span class="pre">android:name=&quot;android.intent.action.MAIN&quot;</span> <span class="pre">/&gt;</span>
+<span class="pre">&lt;category</span> <span class="pre">android:name=&quot;android.intent.category.LAUNCHER&quot;</span> <span class="pre">/&gt;</span>
+<span class="pre">&lt;category</span> <span class="pre">android:name=&quot;android.intent.category.LEANBACK_LAUNCHER&quot;</span> <span class="pre">/&gt;</span>
+<span class="pre">&lt;/intent-filter&gt;</span>
+<span class="pre">&lt;meta-data</span> <span class="pre">android:name=&quot;unityplayer.UnityActivity&quot;</span> <span class="pre">android:value=&quot;true&quot;</span> <span class="pre">/&gt;</span>
+<span class="pre">&lt;meta-data</span> <span class="pre">android:name=&quot;unityplayer.ForwardNativeEventsToDalvik&quot;</span> <span class="pre">android:value=&quot;false&quot;</span> <span class="pre">/&gt;</span>
+<span class="pre">&lt;/activity&gt;</span>
+<span class="pre">`</span></code>
+## Schedule simple notifications
+<strong>The package contains code samples in Assets/Area730/Notifications/Examples/Scripts folder.</strong></p>
+<p>The notifications are created using <strong>NotificationBuilder</strong> class. Its constructor takes 3 arguments - id of the notification, title and notification text.</p>
+<p>Next example example shows how to schedule the notification that will be shown immediately:
+<a href="#id1"><span class="problematic" id="id2">``</span></a><a href="#id3"><span class="problematic" id="id4">`</span></a>c#
+int id          = 1;
+string title    = &#8220;Notification titile&#8221;;
+string body     = &#8220;Notification body&#8221;;</p>
+<p>NotificationBuilder builder = new NotificationBuilder(id, title, body);
+AndroidNotifications.scheduleNotification(builder.build());
+<a href="#id5"><span class="problematic" id="id6">``</span></a>`
+## Schedule delayed notifications
+If you want to set delay - call builder.setDelay(int miliseconds) or builder.setDelay(System.TimeSpan delayTime). The next example shows how to create a notification that will be shown in one hour:</p>
+<p><a href="#id7"><span class="problematic" id="id8">``</span></a><a href="#id9"><span class="problematic" id="id10">`</span></a>c#
+int id          = 1;
+string title    = &#8220;Notification titile&#8221;;
+string body     = &#8220;Notification body&#8221;;</p>
+<p>// Show notification in one hour
+TimeSpan delay  = new TimeSpan(1, 0, 0);</p>
+<p>NotificationBuilder builder = new NotificationBuilder(id, title, body);
+builder.setDelay(delay);</p>
+<p>AndroidNotifications.scheduleNotification(builder.build());
+<a href="#id11"><span class="problematic" id="id12">``</span></a>`
+## Customization
+NotificationBuilder allows you to set different parameters of your notification such as color, small icon, large icon, auto cancel, alert once, ticker, notification number, sound, vibration pattern, group, sort key and if the notification repeats every interval of time.</p>
+<p><strong>All methods with description you can find in NotificationBuilder.cs file.</strong></p>
+<p>Next example shows scheduling of the notification that will be shown in 15 minutes with ticker, default audio and vibration, with autocancel (if you click it - it will be removed from the list), and with red background color (background color is not supported on some Android versions, please refer to Android docs for more info)</p>
+<p><a href="#id13"><span class="problematic" id="id14">``</span></a><a href="#id15"><span class="problematic" id="id16">`</span></a>c#
+int id          = 1;
+string title    = &#8220;New notification&#8221;;
+string body     = &#8220;You have some unfinished business!&#8221;;</p>
+<p>// Show notification in 15 minutes
+TimeSpan delay  = new TimeSpan(0, 15, 0);</p>
+<p>NotificationBuilder builder = new NotificationBuilder(id, title, body);
+builder
+.setTicker(&#8220;New notification from your app!&#8221;)
+.setDefaults(NotificationBuilder.DEFAULT_ALL)
+.setDelay(delay)
+.setAutoCancel(true)
+.setColor(&#8220;#B30000&#8221;);</p>
+<p>AndroidNotifications.scheduleNotification(builder.build()
+<a href="#id17"><span class="problematic" id="id18">``</span></a><a href="#id19"><span class="problematic" id="id20">`</span></a></p>
+<p>## Repeating notifications
+To set repeating notification you should set notification as repeating <strong>and set the time interval</strong>.
+Next example shows scheduling of the notification that will be shown in 5 minutes and then shown every 10 minutes:</p>
+<p><a href="#id21"><span class="problematic" id="id22">``</span></a><a href="#id23"><span class="problematic" id="id24">`</span></a>c#
+int id              = 1;
+string title        = &#8220;New repeating notification&#8221;;
+string body         = &#8220;You have some unfinished business!&#8221;;</p>
+<p>// Show notification in 5 minutes
+TimeSpan delay      = new TimeSpan(0, 5, 0);</p>
+<p>// Show notification with 10 minute interval
+TimeSpan interval   = new TimeSpan(0, 10, 0);</p>
+<p>NotificationBuilder builder = new NotificationBuilder(id, title, body);
+builder
+.setDelay(delay)
+.setRepeating(true)
+.setInterval(interval);</p>
+<p>AndroidNotifications.scheduleNotification(builder.build());
+<a href="#id25"><span class="problematic" id="id26">``</span></a><a href="#id27"><span class="problematic" id="id28">`</span></a></p>
+<p>## Settings custom icons
+You can set custom icons for your notification. There are 2 types of icon - small and large. Small icon is mask.  Both icons should be located in _Assets/Plugins/Android/Notfications/res/<a href="#id55"><span class="problematic" id="id56">drawable_</span></a> folder or one of the drawable folders (e.g. drawable-mdpi etc.).</p>
+<p>You can use these icon generators:</p>
+<ol class="arabic simple">
+<li>[Small icon generator](<a class="reference external" href="http://romannurik.github.io/AndroidAssetStudio/icons-notification.html#source.space.trim=1&amp;source.space.pad=0&amp;name=ic_stat_example">http://romannurik.github.io/AndroidAssetStudio/icons-notification.html#source.space.trim=1&amp;source.space.pad=0&amp;name=ic_stat_example</a>) - generate and download archive with your icons. Then just copy all drawable folders from the archive into _Assets/Plugins/Android/Notifications/<a href="#id57"><span class="problematic" id="id58">res_</span></a> folder and set <strong>the name of the icon without extension</strong> as your small icon - <strong>builder.setSmallIcon(&#8220;myIcon&#8221;)</strong></li>
+<li>[Large icon generator](<a class="reference external" href="http://romannurik.github.io/AndroidAssetStudio/icons-launcher.html#foreground.space.trim=1&amp;foreground.space.pad=0&amp;foreColor=607d8b%2C0&amp;crop=0&amp;backgroundShape=square&amp;backColor=ffffff%2C100&amp;effects=none">http://romannurik.github.io/AndroidAssetStudio/icons-launcher.html#foreground.space.trim=1&amp;foreground.space.pad=0&amp;foreColor=607d8b%2C0&amp;crop=0&amp;backgroundShape=square&amp;backColor=ffffff%2C100&amp;effects=none</a>) - generate and download archive with your icons. The archive will contain mipmap folders (mipmap-mdpi, mipmap-hdpi etc.). Copy the icons into corresponding <strong>drawable</strong> folders in _Assets/Plugins/Android/Notifications/<a href="#id59"><span class="problematic" id="id60">res_</span></a> folder (icon from mipmap-hdpi into drawable-hdpi, mipmap-mdpi into drawable-mdpi etc.). Next, set <strong>the name of the icon without extension</strong> as your large icon - <strong>builder.setLargeIcon(&#8220;myLargeIcon&#8221;)</strong></li>
+</ol>
+<p><a href="#id29"><span class="problematic" id="id30">``</span></a><a href="#id31"><span class="problematic" id="id32">`</span></a>c#
+int     id      = 1;
+string  title   = &#8220;Custom icon&#8221;;
+string  body    = &#8220;You have some unfinished business!&#8221;;</p>
+<p>// Show notification in 5 minutes
+TimeSpan delay = new TimeSpan(0, 5, 0);</p>
+<p>// WARNING: icons should be in Assets/Plugins/Android/Notification/res/drawable(-mdpi etc.) folders
+NotificationBuilder builder = new NotificationBuilder(id, title, body);
+builder
+.setDelay(delay)
+.setSmallIcon(&#8220;mySmallIconFilename&#8221;)
+.setLargeIcon(&#8220;myLargeIconFilename&#8221;);</p>
+<p>AndroidNotifications.scheduleNotification(builder.build());
+<a href="#id33"><span class="problematic" id="id34">``</span></a><a href="#id35"><span class="problematic" id="id36">`</span></a></p>
+<p>## Settings custom sound
+You can set custom sound for your notification. The sound should be located in _Assets/Plugins/Android/Notifications/res/<a href="#id61"><span class="problematic" id="id62">raw_</span></a> folder. To set custom sound use builder.setSound(&#8220;mySound&#8221;) method. <strong>Name of the sound file should be without extension.</strong></p>
+<p><a href="#id37"><span class="problematic" id="id38">``</span></a><a href="#id39"><span class="problematic" id="id40">`</span></a>c#
+int     id      = 1;
+string  title   = &#8220;Custom sound&#8221;;
+string  body    = &#8220;You have some unfinished business!&#8221;;</p>
+<p>// Show notification in 5 minutes
+TimeSpan delay = new TimeSpan(0, 5, 0);</p>
+<p>// WARNING: the sound should be in Assets/Plugins/Android/Notification/res/raw folder
+NotificationBuilder builder = new NotificationBuilder(id, title, body);
+builder
+.setDelay(delay)
+.setSound(&#8220;mySoundFileName&#8221;);</p>
+<p>AndroidNotifications.scheduleNotification(builder.build());
+<a href="#id41"><span class="problematic" id="id42">``</span></a><a href="#id43"><span class="problematic" id="id44">`</span></a></p>
+<p>## Cancel notification by id (both repeating and one-time)
+To cancel the notification by id, simply call AndroidNotifications.cancelNotification(int id).</p>
+<p><code class="docutils literal"><span class="pre">`c#</span>
+<span class="pre">//cancel</span> <span class="pre">notification</span> <span class="pre">with</span> <span class="pre">id</span> <span class="pre">7</span>
+<span class="pre">AndroidNotifications.cancelNotification(7);</span>
+<span class="pre">`</span></code></p>
+<p>## Cancel all notifications
+<code class="docutils literal"><span class="pre">`c#</span>
+<span class="pre">AndroidNotifications.cancelAll();</span>
+<span class="pre">`</span></code></p>
+<p>## Clear shown notifications</p>
+<p>To clear certain notification use AndroidNotifications.clear(int id).</p>
+<p><code class="docutils literal"><span class="pre">`c#</span>
+<span class="pre">//</span> <span class="pre">clear</span> <span class="pre">shown</span> <span class="pre">notification</span> <span class="pre">with</span> <span class="pre">id</span> <span class="pre">7</span>
+<span class="pre">AndroidNotifications.clear(7);</span>
+<span class="pre">`</span></code></p>
+<p>To clear all shown notifications use AndroidNotifications.clearAll().</p>
+<p><code class="docutils literal"><span class="pre">`c#</span>
+<span class="pre">//</span> <span class="pre">clear</span> <span class="pre">all</span> <span class="pre">shown</span> <span class="pre">notifications</span>
+<span class="pre">AndroidNotifications.clearAll();</span>
+<span class="pre">`</span></code></p>
+<p>## Updating notifications
+To update one-time or repeating notification, schedule a notification with updated data and with ID of the notification you want to update.</p>
+<p>## Show android toast notification</p>
+<p>To show a toast notification use AndroidNotifications.showToast(string text).</p>
+<p><code class="docutils literal"><span class="pre">`c#</span>
+<span class="pre">AndroidNotifications.showToast(&quot;Download</span> <span class="pre">completed&quot;);</span>
+<span class="pre">`</span></code></p>
+<p>## Notification editor
+Plugin comes with editor extension that allows you to create notifications without the line of code. To open the notification editor window go to _Window -&gt; Android Local <a href="#id63"><span class="problematic" id="id64">Notifications_</span></a> .</p>
+<p>![](<a class="reference external" href="https://www.dropbox.com/s/6eaaozky16zga9g/window-general.png?raw=1">https://www.dropbox.com/s/6eaaozky16zga9g/window-general.png?raw=1</a>)</p>
+<p>In <strong>Help</strong> section you will find some useful links. In <strong>Settings</strong> section you can set custom Unity class if your activity extends _UnityPlayerNativeActivity_ .
+In <strong>Notification List</strong> section you can add and modify notifications.</p>
+<p>![](<a class="reference external" href="https://www.dropbox.com/s/oqemhfrotuqwsct/notifEditor.png?raw=1">https://www.dropbox.com/s/oqemhfrotuqwsct/notifEditor.png?raw=1</a>)</p>
+<p>When you set custom notification sound or icons in editor window - they will be automatically copied to Notifications/res/drawable and Notifications/res/raw folders. <strong>Though you will still need to add resized versions to drawable-hdpi and other folders using icon generators mentioned above</strong>.</p>
+<p>For detailed information on notification options please refer to [official Android docs](<a class="reference external" href="http://developer.android.com/intl/ru/reference/android/support/v4/app/NotificationCompat.Builder.html">http://developer.android.com/intl/ru/reference/android/support/v4/app/NotificationCompat.Builder.html</a>)</p>
+<p>## Schedule notification created in editor
+You can get notification you created by its name you set in editor
+![](<a class="reference external" href="https://www.dropbox.com/s/h49gx2lixcgku8e/nameNotif.png?raw=1">https://www.dropbox.com/s/h49gx2lixcgku8e/nameNotif.png?raw=1</a>)</p>
+<p>Next example shows scheduling of the notification created in editor with name <strong>notificationOne</strong></p>
+<p><a href="#id45"><span class="problematic" id="id46">``</span></a><a href="#id47"><span class="problematic" id="id48">`</span></a>c#
+string notificationName = &#8220;notificationOne&#8221;;</p>
+<p>// Method returns builder so you can config your notification afterwards if you want
+NotificationBuilder builder = AndroidNotifications.GetNotificationBuilderByName(notificationName);</p>
+<p>// If notification with specified name doesn&#8217;t exist builder will be null
+if (builder != null)
+{
+Notification notif = builder.build();
+AndroidNotifications.scheduleNotification(notif);
+}</p>
+<p><a href="#id49"><span class="problematic" id="id50">``</span></a>`
+###Push Notification With [OneSignal](<a class="reference external" href="https://documentation.onesignal.com/docs/installing-the-onesignal-sdk">https://documentation.onesignal.com/docs/installing-the-onesignal-sdk</a>)
+To configure push notification for android platform follow next steps:</p>
+<ol class="arabic simple">
+<li>Create [GMS](<a class="reference external" href="https://console.cloud.google.com/project">https://console.cloud.google.com/project</a>) application by following [this](<a class="reference external" href="https://documentation.onesignal.com/docs/android-generating-a-gcm-push-notification-key">https://documentation.onesignal.com/docs/android-generating-a-gcm-push-notification-key</a>) tutorial instruction.</li>
+<li>Do [step 3](<a class="reference external" href="https://documentation.onesignal.com/docs/installing-the-onesignal-sdk">https://documentation.onesignal.com/docs/installing-the-onesignal-sdk</a>) to config your <cite>AndroidManifest.xml</cite></li>
+<li>Go to <cite>Assets/Area730/Notifications/PushNotification</cite> drag and drop <cite>PushController.prefab</cite> or just add <cite>CrossPlatformPushNotificationController.cs</cite> script to your gameobject.</li>
+<li>Fill the values in <cite>CrossPlatformPushNotificationController.cs</cite>.</li>
+</ol>
+<p>Now you are ready to send notifications.
+After these steps you will be able to send push notification using [OneSignal](<a class="reference external" href="https://onesignal.com/">https://onesignal.com/</a>) service.</p>
+<p>## Modifying a plugin</p>
+<p>Source code of the plugin is included in the package. You can easily extend it if you want. Java library is built with <strong>AndroidStudio</strong>. There are 2 tasks in _build.gradle_ file you should modify - <strong>deleteOldJar</strong> and <strong>exportJar</strong>.
+![](<a class="reference external" href="https://www.dropbox.com/s/qbqzhfys4fwa0w4/gradleTasks.png?raw=1">https://www.dropbox.com/s/qbqzhfys4fwa0w4/gradleTasks.png?raw=1</a>)</p>
+<p>In <strong>deleteOldJar</strong> task set path to the jar file you will export so every time you run a new build the old version will be deleted. In <strong>exportJar</strong> set the path where you want to export your jar.</p>
+<p>To export jar from AndroidStudio go to _Gradle Projects/Tasks/<a href="#id65"><span class="problematic" id="id66">Other_</span></a> and run <strong>exportJar</strong> task.</p>
+<p>In Unity plugin is in _Assets/Plugins/Android/<a href="#id67"><span class="problematic" id="id68">Notifications_</span></a> folder. It is stored as android library project.</p>
+<p>To debug this plugin in AndroidStudio add <strong>Area730Log</strong> log tag to you logcat filter.</p>
+<p>## Other
+All classes are located in <strong>Area730.Notifications</strong> namespace</p>
+<p>Example scene with sample code is included in the package (_Assets/Area730/Notifications/<a href="#id69"><span class="problematic" id="id70">Examples_</span></a>)</p>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Area730.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+      |
+      <a href="_sources/index.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
