@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # AndroidNotification documentation build configuration file, created by
-# sphinx-quickstart on Mon Apr 18 19:16:45 2016.
+# sphinx-quickstart on Mon Apr 18 20:33:16 2016.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -29,7 +29,9 @@ import os
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = []
+extensions = [
+    'sphinx.ext.githubpages',
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -37,7 +39,7 @@ templates_path = ['_templates']
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 # source_suffix = ['.rst', '.md']
-source_suffix = '.md'
+source_suffix = '.rst'
 
 # The encoding of source files.
 #source_encoding = 'utf-8-sig'
@@ -273,6 +275,12 @@ texinfo_documents = [
      author, 'AndroidNotification', 'One line description of project.',
      'Miscellaneous'),
 ]
+
+import sphinx_rtd_theme
+
+html_theme = "sphinx_rtd_theme"
+
+html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # Documents to append as an appendix to all manuals.
 #texinfo_appendices = []
